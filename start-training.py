@@ -52,7 +52,7 @@ def parse_args(argv=sys.argv[1:]):
         help="Port on which to run tensorboard.")
     parser.add_argument('-w', '--wandb', action='store_true',
         help='Use wandb for analytics.')
-    parser.add_argument('--project', default=None,
+    parser.add_argument('--project', default="stacey/saferlife",
         help='[Entity and] project for wandb. '
         'Eg: "safelife/multiagent" or "multiagent"')
     parser.add_argument('--shutdown', action="store_true",
