@@ -41,6 +41,7 @@ from collections import defaultdict
 
 import gym
 import numpy as np
+#import wandb
 
 try:
     import ray
@@ -173,7 +174,7 @@ class SafeLifeLogger(BaseLogger):
         'training': {
             'episode_logname': "training-log.json",
             'video_name': "train-s{training_steps}-{level_name}",
-            'video_interval': 200,
+            'video_interval': 1,
             'episode_msg': textwrap.dedent("""
                 Training episode completed.
                     level name: {level_name}
@@ -225,7 +226,8 @@ class SafeLifeLogger(BaseLogger):
         self.last_game = None
         self.last_data = None
         self.last_history = None
-
+        self.dsviz_table = self.wandb.Table(columns=["video"])
+        self.dsviz_len = 0
         self.reset_summary()
 
     def init_logdir(self):
@@ -345,7 +347,7 @@ class SafeLifeLogger(BaseLogger):
                 render_file(vname, movie_format="mp4")
                 if self.wandb is not None:
                     tb_data['video'] = self.wandb.Video(vname[:-3] + 'mp4')
-
+        #import pdb; pdb.set_trace()
         self.log_scalars(tb_data, tag=tag)
 
         # Save some data which can be retrieved by e.g. the level iterator.
@@ -401,6 +403,12 @@ class SafeLifeLogger(BaseLogger):
                 if np.isreal(val) and np.isscalar(val) or
                 isinstance(val, self.wandb.Video)
             }
+            print(data.keys())
+            #import pdb; pdb.set_trace()
+            # this is where we could log a dsviz table?
+            if "training/video" in data:
+                print("ADDING VIDEO")
+                self.dsviz_table.add_data(data["training/video"])
             self.wandb.log(w_data)
 
     def reset_summary(self):
@@ -762,7 +770,7 @@ def summarize_run_file(logfile, wandb_run=None, artifact=None, se_weights=None):
     return summary
 
 
-def summarize_run(data_dir, wandb_run=None):
+def summarize_run(data_dir, wandb_run=None, ml_logger=None):
     if wandb_run is not None:
         import wandb
         artifact = wandb.Artifact('episode_data', type='episode_data')
@@ -776,3 +784,7 @@ def summarize_run(data_dir, wandb_run=None):
 
     if artifact is not None:
         wandb_run.log_artifact(artifact)
+    # log dsviz table
+    video_table = wandb.Artifact("video", type="video")
+    video_table.add(ml_logger.dsviz_table, "video_examples")
+    wandb_run.log_artifact(video_table)

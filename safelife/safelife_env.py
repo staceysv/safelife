@@ -62,7 +62,7 @@ class SafeLifeEnv(gym.Env):
     # The following are default parameters that can be overridden during
     # initialization.
     single_agent = True
-    time_limit = 1000
+    time_limit = 50
     remove_white_goals = True
     view_shape = (15, 15)
     # default to all channels of the board, but only the colors of the goals

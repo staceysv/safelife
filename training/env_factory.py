@@ -191,8 +191,8 @@ task_types = {
     'append-spawn': {
         'iter_class': SwitchingLevelIterator,
         'train_levels': ['random/append-still-easy', 'random/append-spawn'],
-        'validation_levels': ['random/append-spawn'],
-        'benchmark_levels': 'benchmarks/v1.0/append-spawn.npz',
+        'validation_levels': ['random/append-spawn']
+        ##'benchmark_levels': 'benchmarks/v1.0/append-spawn.npz',
     },
     'prune-spawn': {
         'iter_class': SwitchingLevelIterator,

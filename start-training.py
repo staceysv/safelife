@@ -233,6 +233,7 @@ def launch_tensorboard(job_name, data_dir, port):
     else:
         return None
 
+algo_args = {}
 
 def launch_training(config, data_dir):
     from training import logging_setup
@@ -241,7 +242,7 @@ def launch_training(config, data_dir):
 
     envs = build_environments(config, data_dir)
     obs_shape = envs['training'][0].observation_space.shape
-
+    global algo_args
     algo_args = {
         'training_envs': envs['training'],
         'testing_envs': envs.get('validation'),
@@ -296,7 +297,7 @@ def cleanup(config, data_dir, tb_proc, shutdown):
 
     try:
         if config['run_type'] in ['train', 'benchmark']:
-            summarize_run(data_dir, wandb_run)
+            summarize_run(data_dir, wandb_run, algo_args["data_logger"])
     except:  # noqa
         import traceback
         logger.warn("Exception during summarization:\n", traceback.format_exc())
