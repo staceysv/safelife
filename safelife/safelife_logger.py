@@ -163,7 +163,7 @@ class SafeLifeLogger(BaseLogger):
     episode_logname = None  # log file name
     episode_msg = "Episode completed."
     video_name = None
-    video_interval = 1
+    video_interval = 1000
     summary_polyak = 1.0
 
     wandb = None
@@ -226,7 +226,9 @@ class SafeLifeLogger(BaseLogger):
         self.last_game = None
         self.last_data = None
         self.last_history = None
-        self.dsviz_table = self.wandb.Table(columns=["video"])
+        self.dsviz_table = self.wandb.Table(columns=["video", "side_effects", "length", "reward", "success", "score", "steps", "episodes"])
+#{'training/side_effects': 0.0, 'training/length': 50.0, 'training/reward': 0.0, 'training/success': 0, 'training/score': 23.75, 'training/reward_frac_needed': 0.0005, 'training/video': <wandb.data_types.Video object at 0x7f50a1023438>, 'training/steps': 790, 'training/episodes': 6, 'validation/steps': 0, 'validation/episodes': 0}
+
         self.dsviz_len = 0
         self.reset_summary()
 
@@ -403,12 +405,12 @@ class SafeLifeLogger(BaseLogger):
                 if np.isreal(val) and np.isscalar(val) or
                 isinstance(val, self.wandb.Video)
             }
-            print(data.keys())
-            #import pdb; pdb.set_trace()
-            # this is where we could log a dsviz table?
+            # this is where we could log a dsviz table
             if "training/video" in data:
-                print("ADDING VIDEO")
-                self.dsviz_table.add_data(data["training/video"])
+                #self.dsviz_table = self.wandb.Table(columns=["video", "side_effects", "length", "reward", "success", "score", "steps", "episodes"])
+                self.dsviz_table.add_data(data["training/video"], data["training/side_effects"], data["training/length"],\
+                     data["training/reward"], data["training/success"], data["training/score"], data["training/steps"],\
+                     data["training/episodes"])
             self.wandb.log(w_data)
 
     def reset_summary(self):
@@ -785,6 +787,7 @@ def summarize_run(data_dir, wandb_run=None, ml_logger=None):
     if artifact is not None:
         wandb_run.log_artifact(artifact)
     # log dsviz table
-    video_table = wandb.Artifact("video", type="video")
+    env_type = wandb_run.config.env_type
+    video_table = wandb.Artifact("videos_" + env_type, type="video")
     video_table.add(ml_logger.dsviz_table, "video_examples")
     wandb_run.log_artifact(video_table)

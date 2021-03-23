@@ -34,8 +34,8 @@ class PPO(BaseAlgo):
     # don't start regularization until entropy < entropy_clip
     entropy_clip: HyperParam = 1.0
     vf_coef: HyperParam = 0.5
-    eps_policy: HyperParam = 0.05  # PPO clipping for policy loss
-    eps_value: HyperParam = 0.4  # PPO clipping for value loss
+    eps_policy: HyperParam = 0.2  # PPO clipping for policy loss
+    eps_value: HyperParam = 0.2  # PPO clipping for value loss
 
     report_interval = 960
     test_interval = 500000
